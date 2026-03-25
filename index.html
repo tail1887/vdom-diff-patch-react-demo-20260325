@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!--
+  Naming 규칙
+  - section.demo-phase[data-phase="N"] — N 단계 블록
+  - container-phase-N-*  — N 단계에서 다루는 DOM 루트/마운트
+  - output-phase-N-*     — 읽기 전용 출력(pre 등)
+  - control-phase-N-*    — 입력(버튼, select)
+
+  스크립트: vdom.js → diff.js → patch.js → phase1-demo.js → phase5-workshop.js
+-->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VDOM 데모 · 1~5단계 (워크숍 UI · 히스토리)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-head">
+        <p class="eyebrow">Virtual DOM · 수요 코딩회 데모</p>
+        <h1 class="page-title">DOM ↔ VNode · Diff · Patch <span class="page-title__sep">·</span> 1~5단계</h1>
+        <p class="page-lead">
+          <strong>5단계</strong>는 과제 형태의 <strong>실제 영역</strong>(패치만 적용) +
+          <strong>테스트 영역</strong>(HTML 편집) + <strong>Patch / 뒤로 / 앞으로</strong> 와 VNode 히스토리입니다.
+        </p>
+        <div class="hint-card" role="note">
+          <span class="hint-card__tag">단계</span>
+          <p class="hint-card__text">
+            <strong>1~4</strong> 학습 데모 · <strong>5</strong> 통합 워크숍(<code>container-phase-5-*</code>)
+          </p>
+        </div>
+      </header>
+
+      <!-- ========== 1단계: DOM → VNode ========== -->
+      <section class="demo-phase" data-phase="1" aria-labelledby="heading-phase-1">
+        <header class="demo-phase__header demo-phase__header--accent-1">
+          <span class="demo-phase__badge" aria-hidden="true">1</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-1">DOM → VNode</h2>
+            <p class="demo-phase__desc">소스 DOM · 덤프 · <code>domToVNode</code> 결과</p>
+          </div>
+        </header>
+
+        <div class="demo-phase__grid grid grid--3">
+          <article class="panel panel--accent panel--accent-1" data-subpanel="source">
+            <h3 class="panel__title panel__title--sub">소스 (실제 DOM)</h3>
+            <p class="panel-note">마운트: <code>container-phase-1-sample</code></p>
+            <div id="container-phase-1-sample" class="sample-box">
+              <h2 id="title" class="title" data-role="heading">안녕, VDOM</h2>
+              <p class="desc">
+                이 문단은 <span class="hl">강조</span>와
+                <a href="#container-phase-1-sample" class="link" data-kind="internal">링크</a>를 포함합니다.
+              </p>
+              <ul class="list">
+                <li class="item" data-index="0">첫 항목</li>
+                <li class="item" data-index="1">둘째 항목</li>
+              </ul>
+              <div class="empty" aria-hidden="true"></div>
+            </div>
+          </article>
+
+          <article class="panel panel--accent panel--accent-2" data-subpanel="dump">
+            <h3 class="panel__title panel__title--sub">DOM 덤프</h3>
+            <p class="panel-note"><code>output-phase-1-outer-html</code> · <code>output-phase-1-tree-outline</code></p>
+            <div class="code-wrap">
+              <div class="code-wrap__bar"><span class="code-wrap__label">outerHTML</span></div>
+              <pre id="output-phase-1-outer-html" class="code-block code-block--sm" aria-label="DOM outerHTML"></pre>
+            </div>
+            <div class="code-wrap">
+              <div class="code-wrap__bar"><span class="code-wrap__label">트리 요약</span></div>
+              <pre id="output-phase-1-tree-outline" class="code-block code-block--sm"></pre>
+            </div>
+          </article>
+
+          <article class="panel panel--accent panel--accent-3" data-subpanel="vnode">
+            <h3 class="panel__title panel__title--sub">VNode JSON</h3>
+            <p class="panel-note"><code>output-phase-1-vdom-json</code></p>
+            <div class="code-wrap code-wrap--grow">
+              <div class="code-wrap__bar">
+                <span class="code-wrap__label">JSON</span>
+                <span class="code-wrap__hint">스크롤</span>
+              </div>
+              <pre id="output-phase-1-vdom-json" class="code-block code-block--tall"></pre>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ========== 2단계: VNode → DOM ========== -->
+      <section class="demo-phase" data-phase="2" aria-labelledby="heading-phase-2">
+        <header class="demo-phase__header demo-phase__header--accent-4">
+          <span class="demo-phase__badge" aria-hidden="true">2</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-2">VNode → DOM</h2>
+            <p class="demo-phase__desc">
+              <code>container-phase-2-mount</code> — <code>renderVNodeInto</code>( id 제거 복제본 )
+            </p>
+          </div>
+        </header>
+        <p class="demo-phase__note panel-note">
+          빛 DOM 이라 문서 전역 <code>id</code> 는 제거한 VNode 만 렌더해 샘플과 충돌하지 않게 했습니다.
+        </p>
+        <div id="container-phase-2-mount" class="sample-box sample-box--from-vnode" tabindex="0"></div>
+      </section>
+
+      <!-- ========== 3단계: Diff ========== -->
+      <section class="demo-phase" data-phase="3" aria-labelledby="heading-phase-3">
+        <header class="demo-phase__header demo-phase__header--accent-5">
+          <span class="demo-phase__badge" aria-hidden="true">3</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-3">Diff</h2>
+            <p class="demo-phase__desc"><code>diffVNode</code> → <code>output-phase-3-patches</code></p>
+          </div>
+        </header>
+        <div class="diff-toolbar">
+          <label class="diff-toolbar__label" for="control-phase-3-scenario">시나리오</label>
+          <select id="control-phase-3-scenario" class="diff-select" aria-describedby="help-phase-3-patches">
+            <option value="same">동일 트리 (깊은 복제)</option>
+            <option value="stripIds" selected>id 제거 복제 (화면은 비슷·속성만 변경)</option>
+            <option value="editTitle">첫 h2: VDOM → Diff</option>
+          </select>
+        </div>
+        <p id="help-phase-3-patches" class="panel-note diff-help">
+          연산 종류: <code>SET_TEXT</code>, <code>SET_PROP</code>, <code>REMOVE_PROP</code> 등 — <code>js/diff.js</code> 참고.
+          <strong>id 제거 복제</strong>는 글자·색은 그대로이고 <strong>속성만</strong> 바뀌어서 화면은 거의 같아 보입니다.
+          패치 개수는 <code>patchCount</code>로 확인하세요. 이 셀렉트는 <strong>2단계 박스에는 반영되지 않고</strong> 3·4단계만 바뀝니다.
+        </p>
+        <div class="code-wrap code-wrap--grow code-wrap--diff">
+          <div class="code-wrap__bar"><span class="code-wrap__label">Patches</span></div>
+          <pre id="output-phase-3-patches" class="code-block code-block--diff"></pre>
+        </div>
+      </section>
+
+      <!-- ========== 4단계: Patch ========== -->
+      <section class="demo-phase" data-phase="4" aria-labelledby="heading-phase-4">
+        <header class="demo-phase__header demo-phase__header--accent-patch">
+          <span class="demo-phase__badge" aria-hidden="true">4</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-4">Patch</h2>
+            <p class="demo-phase__desc">
+              <code>applyPatches</code> · 호스트 <code>container-phase-4-mount</code> (Shadow 안에 동일 구조 DOM)
+            </p>
+          </div>
+        </header>
+        <p class="demo-phase__note panel-note">
+          <strong>초기화</strong> 후 <strong>패치 적용</strong>을 누르세요. 변경 확인: 개발자 도구(F12) →
+          <code>container-phase-4-mount</code> → <code>#shadow-root</code> → 요소 선택 →
+          <strong>id 속성</strong>이 사라졌는지 봅니다. 아래 상태 줄에도 id 개수(전→후)를 찍습니다.
+        </p>
+        <div class="phase4-toolbar">
+          <button type="button" id="control-phase-4-reset" class="btn-phase4">초기화 (이전 VNode 기준으로 다시 그리기)</button>
+          <button type="button" id="control-phase-4-apply" class="btn-phase4 btn-phase4--primary">현재 시나리오 패치 적용</button>
+        </div>
+        <p id="output-phase-4-status" class="panel-note phase4-status" aria-live="polite"></p>
+        <div
+          id="container-phase-4-mount"
+          class="sample-box sample-box--patch-host"
+          title="ShadowRoot 호스트 — 내부 DOM 은 개발자 도구에서 shadow-root 로 확인"
+        ></div>
+      </section>
+
+      <!-- ========== 5단계: 통합 UI · 히스토리 (과제 플로우) ========== -->
+      <section class="demo-phase" data-phase="5" aria-labelledby="heading-phase-5">
+        <header class="demo-phase__header demo-phase__header--accent-workshop">
+          <span class="demo-phase__badge" aria-hidden="true">5</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-5">통합 워크숍 · 히스토리</h2>
+            <p class="demo-phase__desc">
+              <code>container-phase-5-real-mount</code> · <code>control-phase-5-test-html</code> ·
+              <code>control-phase-5-patch|back|forward</code>
+            </p>
+          </div>
+        </header>
+        <p class="demo-phase__note panel-note">
+          초기 트리는 1단계 샘플과 같은 형태이되 <strong>id 는 제거한 VNode</strong>입니다(전역 id 충돌 방지).
+          테스트 영역은 <strong>단일 루트</strong> HTML 만 넣으세요. Patch 시 <strong>실제 영역 DOM</strong>만
+          패치하고, 커밋된 VNode 를 히스토리에 쌓습니다.
+        </p>
+
+        <div class="workshop-split">
+          <div class="workshop-col">
+            <h3 class="workshop-col__title">실제 영역</h3>
+            <p class="panel-note workshop-col__id"><code id="label-real-mount">container-phase-5-real-mount</code></p>
+            <div id="container-phase-5-real-mount" class="sample-box workshop-real-mount"></div>
+          </div>
+          <div class="workshop-col">
+            <h3 class="workshop-col__title">테스트 영역 (HTML)</h3>
+            <p class="panel-note workshop-col__id"><code>control-phase-5-test-html</code></p>
+            <textarea
+              id="control-phase-5-test-html"
+              class="workshop-textarea"
+              spellcheck="false"
+              rows="18"
+              aria-label="테스트용 HTML 편집"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="phase5-toolbar">
+          <button type="button" id="control-phase-5-patch" class="btn-phase5 btn-phase5--primary">Patch</button>
+          <button type="button" id="control-phase-5-back" class="btn-phase5">뒤로</button>
+          <button type="button" id="control-phase-5-forward" class="btn-phase5" disabled>앞으로</button>
+        </div>
+        <p id="output-phase-5-status" class="panel-note phase5-status" aria-live="polite"></p>
+      </section>
+
+      <!-- ========== 6단계: 테스트 결과 (단위테스트 UI) ========== -->
+      <section class="demo-phase" data-phase="6" aria-labelledby="heading-phase-6">
+        <header class="demo-phase__header demo-phase__header--accent-5">
+          <span class="demo-phase__badge" aria-hidden="true">6</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-phase-6">단위테스트</h2>
+            <p class="demo-phase__desc">
+              브라우저 내 간단 테스트 러너 · <code>PASS / FAIL</code> 표시
+            </p>
+          </div>
+        </header>
+
+        <p class="demo-phase__note panel-note">
+          페이지 로드 시 자동으로 실행되며, 아래 버튼으로 재실행할 수 있습니다.
+        </p>
+
+        <div class="phase5-toolbar">
+          <button type="button" id="control-phase-6-run" class="btn-phase5 btn-phase5--primary">
+            테스트 실행
+          </button>
+        </div>
+
+        <p id="output-phase-6-status" class="panel-note" aria-live="polite"></p>
+
+        <div class="code-wrap code-wrap--grow">
+          <div class="code-wrap__bar">
+            <span class="code-wrap__label">로그</span>
+            <span class="code-wrap__hint">스크롤</span>
+          </div>
+          <pre id="output-phase-6-log" class="code-block code-block--tall"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/vdom.js"></script>
+    <script src="js/diff.js"></script>
+    <script src="js/patch.js"></script>
+    <script src="js/phase1-demo.js"></script>
+    <script src="js/phase5-workshop.js"></script>
+    <script src="js/unit-tests.js"></script>
+  </body>
+</html>
