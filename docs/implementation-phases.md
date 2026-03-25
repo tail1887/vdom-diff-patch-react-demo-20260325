@@ -7,55 +7,29 @@
 
 ---
 
-## 학습 노트 (대화 중 질문에서 보강한 내용)
+## 학습 노트 (질문 기반 핵심 정리)
 
-스스로 질문했던 내용을 문서에도 남겨, 나중에 README·발표로 옮기기 쉽게 한다.  
-같은 내용은 `js/vdom.js` 파일 최상단 주석에 더 길게 적어 두었다.
+이 문서는 “무엇이/왜” 헷갈리는지를 발표용 관점에서 짧게 정리한다.
 
-### “VNode 는 JSON 으로 복사·비교(diff) 하기 쉬워야 한다” — 왜 그 조건이 나오나?
+### 1) 왜 VNode(스냅샷)인가?
+- diff는 **old/new 값 비교**가 핵심이므로, DOM 대신 **순수 객체 트리(VNode)** 를 비교 재료로 둔다.
+- 히스토리(뒤로/앞으로)는 “그 시점의 UI”를 **스냅샷으로 저장**해야 해서 VNode가 유리하다.
 
-- **Diff 는 값 비교**다. 알고리즘이 보는 것은 “이전 트리의 데이터”와 “다음 트리의 데이터”의 차이이지, 브라우저가 들고 있는 **살아 있는 Node 참조** 자체가 아니다.
-- 과제의 **히스토리(뒤로/앞으로)** 는 “그 시점의 UI 설명”을 **스냅샷으로 저장**해야 하므로, 순수 객체 트리(VNode)가 **깊은 복사·저장**에 유리하다.
-- **JSON** 은 조건의 핵심이라기보다 대표적인 표현이다. 핵심은 **직렬화에 가깝고 순환 참조가 없는 순수 스냅샷**이다. `JSON.stringify` 로 덤프가 된다면 디버깅·데모·테스트에 편하다.
+### 2) diff/patch는 언제 일어나는가?
+- 이 구현은 DOM을 관찰해서 자동 diff를 돌리지 않는다.
+- `5단계`: 사용자가 `Patch` 버튼을 누르는 순간 `diffVNode(committed, testVNode)`를 계산하고, 그 다음 `applyPatches(...)`로 실제 DOM을 변경한다.
 
-### 그럼 **실제 DOM** 으로 diff 하면 왜 곤란한가?
+### 3) 공백/줄바꿈 텍스트 노드는 왜 보이나?
+- `domToVNode`가 자식을 모을 때 `childNodes`를 사용한다.
+- 따라서 요소 사이 줄바꿈/공백이 텍스트 노드(`type: '#text'`)로 VNode에 포함될 수 있다.
 
-- DOM 노드는 **네이티브 객체**이고 **부모·자식·형제로 서로 참조**하는 **그래프**에 가깝다. “두 DOM 트리를 값으로만 비교”하려면 결국 **추출한 데이터**가 필요해진다(그게 `domToVNode`).
-- 화면이 같아 보여도 **노드를 새로 만들면 참조는 전부 달라진다.** 참조 동등성으로는 “구조가 같은지”를 말하기 어렵다.
-- DOM 에는 **속성 문자열 밖의 상태**(리스너 등)도 붙을 수 있어, 과제가 말하는 “구조·속성·텍스트” 중심의 비교 단위와 맞추기 어렵다.
+### 4) 구조 교체는 언제 필요한가?
+- `REPLACE_NODE`: `type`이 다를 때(태그/노드종류 교체)
+- `REPLACE_CHILDREN`: 자식 길이가 다를 때(이 구현의 단순화 정책)
 
-### 연관 개념 (이전에 헷갈렸던 포인트 짧게)
-
-- **동적 화면 = 전체 새로고침이 없다:** 자바스크립트로 DOM 을 바꾸는 것 자체가 새로고침이 아니다. React 전용 기능이 아니다.
-- **React 가 “다시 그림”을 없애지는 않는다:** 픽셀이 바뀌면 브라우저는 그릴 수 있다. 다만 **실제 DOM 을 어떻게·얼마나 건드리느냐**를 줄이려는 전략이 재조정에 가깝다.
-- **추상화(React 등):** DOM 조작이 기술적으로 불가능해서가 아니라, 큰 앱에서 **상태와 화면을 맞추기·유지하기** 쉽게 하려는 층이다.
-
----
-
-## 프로젝트 파일 맵 (현재)
-
-| 경로 | 설명 |
-|------|------|
-| `index.html` | 데모 페이지 — `demo-phase`, `container-phase-N-*`, `output-phase-N-*`, `control-phase-N-*` |
-| `css/base.css` | 레이아웃·스타일 |
-| `js/vdom.js` | **1~2단계** — `domToVNode`, `vnodeToDom`, `renderVNodeInto` |
-| `js/diff.js` | **3단계** — `diffVNode` |
-| `js/patch.js` | **4단계** — `getDomNodeAtPath`, `applyPatches` |
-| `js/phase1-demo.js` | 1~4단계 UI 연동(Shadow 4단계) |
-| `js/phase5-workshop.js` | **5단계** — 실제/테스트 분리, Patch, VNode 히스토리(뒤로/앞으로) |
-| `docs/implementation-phases.md` | 이 문서 |
-| `docs/requirements.md` | 과제 요구사항·중점·발표 조건 정리본 |
-
----
-
-## 전체 로드맵 (과제 기준)
-
-1. **완료: DOM → Virtual DOM** (`domToVNode`)
-2. **완료: Virtual DOM → DOM** (`container-phase-2-mount`)
-3. **완료: Diff** (`output-phase-3-patches`, `control-phase-3-scenario`)
-4. **완료: Patch** (`applyPatches`, `container-phase-4-mount` + Shadow)
-5. **완료: 과제용 UI** — 실제/테스트 영역 분리, 통합 Patch, 되돌리기·앞으로(히스토리) — `phase5-workshop.js`
-6. **완료: 테스트 UI** — 브라우저 내 단위테스트 러너(PASS/FAIL 표시) — `js/unit-tests.js`
+### 5) React는 무엇을 비슷하게 하나?
+- React도 큰 방향은 “가상 표현 비교 후 최소 변경 커밋”이다.
+- 다만 이 데모는 그 과정을 diff/patch로 눈에 보이게 분리해 학습하도록 만든다.
 
 ---
 
@@ -76,6 +50,49 @@
   - 그 외(예: 주석) → `null`, 부모 `children` 에 포함하지 않음
 - **자식 수집:** `childNodes` 사용 (텍스트·요소 모두 포함, 원본 DOM 에 충실)
 - **속성:** `getAttributeNames` / `getAttribute` 로 문자열 맵 `props` 에 저장
+
+### 시퀀스 다이어그램 (DOM → VNode)
+
+```mermaid
+sequenceDiagram
+  participant DOMRoot as DOM(Node)
+  participant Conv as domToVNode
+  participant Elem as elementToVNode
+  participant Text as textToVNode
+  participant Out as VNode
+
+  DOMRoot->>Conv: domToVNode(node)
+  alt nodeType is Element
+    Conv->>Elem: elementToVNode(el)
+    Elem->>Elem: collect props(getAttributeNames/getAttribute)
+    Elem->>Conv: for each child in el.childNodes
+    Conv-->>Elem: child VNode
+    Elem-->>Out: {type, props, children}
+  else nodeType is Text
+    Conv->>Text: textToVNode(textNode)
+    Text-->>Out: {type:'#text', value}
+  else nodeType is Fragment
+    Conv-->>Out: {type:'#document-fragment', children}
+  else Other
+    Conv-->>Out: null
+  end
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 `domToVNode`가 DOM 노드의 `nodeType`을 보고 “어떤 VNode 형태를 만들지”를 결정하는 과정을 보여줍니다.
+
+- `DOMRoot->>Conv: domToVNode(node)`는 변환 시작점을 의미합니다.
+- `alt nodeType is Element/Text/Fragment/Other`는 `domToVNode`의 `switch(node.nodeType)` 분기를 의미합니다.
+- Element 분기에서 `elementToVNode(el)`가 호출되고, 그 안에서 `props`를 수집한 뒤 `el.childNodes`를 순회하며 각 자식을 다시 `domToVNode`로 변환합니다.
+- `Conv-->>Elem: child VNode`와 `Elem-->>Out: {type, props, children}`은 “자식 변환 결과를 children 배열에 누적해서 최종 VNode를 조립”한다는 뜻입니다.
+- Text 분기에서는 텍스트 노드의 문자열을 `value`로 저장하는 `textToVNode`가 반환하는 형태가 그대로 보입니다.
+- Other는 주석 같은 지원하지 않는 노드를 `null`로 반환하고 부모의 children에 포함되지 않음을 의미합니다.
+
+관찰 포인트는 “실제로 눈에 보이지 않는 줄바꿈/공백도 childNodes에 텍스트 노드로 남을 수 있어서, VNode JSON에 `#text`가 함께 등장할 수 있다”는 부분입니다. 이게 diff 입력이 어떤 단위를 포함하는지 이해하게 해줍니다.
+
+### 흐름 포인트
+- `nodeType` 분기 후, Element면 `props` + `children` 재귀 구성
+- `childNodes`를 써서 공백/줄바꿈도 `#text`로 들어갈 수 있음
 
 ### 검증 방법
 
@@ -105,6 +122,51 @@
 - **`vnodeElementToDom`** — `props` 를 `setAttribute` 로 반영 (`true` → 빈 문자열 속성).
 - **`vnodeAppendChildren`** — 자식 VNode 를 재귀적으로 DOM 에 연결.
 - **`renderVNodeInto(container, vnode)`** — `container.replaceChildren()` 후 루트 노드(또는 fragment) 부착.
+
+### 시퀀스 다이어그램 (VNode → DOM)
+
+```mermaid
+sequenceDiagram
+  participant Render as renderVNodeInto(container,vnode)
+  participant V2D as vnodeToDom(vnode)
+  participant El as vnodeElementToDom
+  participant Append as vnodeAppendChildren
+  participant DOM as DOM(Container)
+
+  Render->>DOM: container.replaceChildren()
+  Render->>V2D: vnodeToDom(vnode)
+  alt Text VNode
+    V2D-->>Render: createTextNode(value)
+  else Fragment VNode
+    V2D-->>Render: createDocumentFragment()
+    Render->>Append: append children into fragment
+  else Element VNode
+    V2D->>El: vnodeElementToDom(vnode)
+    El->>DOM: createElement(type)
+    El->>El: setAttribute(props)
+    El->>Append: append children recursively
+    El-->>V2D: Element node
+  else Unsupported
+    V2D-->>Render: null
+  end
+  Render->>DOM: container.appendChild(renderedNode)
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 “VNode 스냅샷을 실제 DOM 노드로 복원”하는 과정을, 생성 단계와 컨테이너 부착 단계로 나눠 보여줍니다.
+
+- `container.replaceChildren()`은 렌더링 전에 기존 DOM을 비우는 동작입니다(통째 렌더 전략).
+- `renderVNodeInto -> vnodeToDom`은 “루트 VNode를 실제 Node로 바꾸는 책임”이 `vnodeToDom`에 있음을 나타냅니다.
+- `alt Text/Fragment/Element`는 `vnodeToDom`이 `vnode.type`을 보고 생성 방식을 분기한다는 뜻입니다.
+- Text에서는 `document.createTextNode(value)`가 반환되고, 그대로 `container.appendChild(renderedNode)`로 붙습니다.
+- Fragment에서는 `document.createDocumentFragment()`를 만들고, 자식들을 `vnodeAppendChildren`로 붙인 뒤 결과를 컨테이너에 붙입니다.
+- Element에서는 `vnodeElementToDom`이 `createElement(type)`, `setAttribute(props)`, 그리고 `vnodeAppendChildren`의 재귀 호출로 자식들을 붙입니다.
+
+관찰 포인트는 이 단계가 “diff로 만든 patches의 결과가 실제 DOM에서 동일 구조로 재현되는지”를 확인하는 검증 역할도 한다는 점입니다.
+
+### 흐름 포인트
+- VNode 생성은 `vnodeToDom` 계열이 담당하고, 실제 컨테이너 부착은 `renderVNodeInto`가 담당한다.
+- `renderVNodeInto`는 컨테이너를 비운 뒤 루트를 통째로 붙이는 흐름이라 “초기 렌더/복원”에 적합하다.
 
 ### 데모
 
@@ -136,6 +198,50 @@
 - **요소 동일 태그**: `diffProps` → `REMOVE_PROP` / `SET_PROP`.
 - **자식**: 길이 같으면 인덱스마다 재귀; **길이 다르면** `REPLACE_CHILDREN`(전체 자식 교체).
 
+### 시퀀스 다이어그램 (Diff → patches[])
+
+```mermaid
+sequenceDiagram
+  participant Diff as diffVNode
+  participant Walk as diffWalk(path)
+  participant Props as diffProps
+  participant Children as diffChildren
+  participant PatchArr as patches[]
+
+  Diff->>Walk: diffWalk(oldVNode,newVNode,[])
+  Walk-->>PatchArr: decide op(SET_TEXT/SET_PROP/REPLACE_NODE/...)
+
+  alt old null & new not null
+    Walk-->>PatchArr: REPLACE_NODE(path,newVNode)
+  else new null & old not null
+    Walk-->>PatchArr: REMOVE_NODE(path)
+  else text & text
+    Walk-->>PatchArr: SET_TEXT(value 변경 시)
+  else type differs
+    Walk-->>PatchArr: REPLACE_NODE(path,newVNode)
+  else same element type
+    Walk->>Props: diffProps(old.props,new.props,path)
+    Walk->>Children: diffChildren(old.children,new.children,path)
+    Children-->>Walk: diffWalk 재귀 or REPLACE_CHILDREN
+  end
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 `diffVNode`가 내부적으로 `diffWalk`를 재귀 호출하며, 최종적으로 patches[]를 “명령 목록” 형태로 만들어내는 과정을 보여줍니다.
+
+- `diffVNode(old,new)`는 루트에서 `diffWalk(..., path=[])`를 시작합니다.
+- `alt ...` 분기는 `diffWalk` 내부의 if/return 흐름과 1:1로 대응됩니다.
+- 텍스트 분기에서는 value가 다를 때만 `SET_TEXT`를 추가하고, 같으면 더 내려가지 않고 종료합니다.
+- 타입이 다르면 하위 비교를 건너뛰고 `REPLACE_NODE`로 서브트리를 통째로 교체하는 결정을 보여줍니다.
+- 같은 요소 타입이면 먼저 `diffProps`로 `SET_PROP`/`REMOVE_PROP`를 계산하고, 그 다음 `diffChildren`으로 자식 비교를 진행합니다.
+- 자식 비교는 길이가 같을 때만 인덱스별 재귀 diff가 되고, 길이가 다르면 이 구현 정책대로 `REPLACE_CHILDREN`으로 “통째 교체”가 됩니다.
+
+관찰 포인트는 diff가 “DOM을 바꾸지 않는다”는 점이며, output은 항상 patches[]라는 데이터라는 점입니다.
+
+### 흐름 포인트
+- diff는 DOM을 바꾸지 않고, `patches[]` 명령 목록만 계산한다.
+- `path`로 “어디를” 지정하고, `op`로 “무엇을” 바꿀지 정의한다.
+
 ### 데모 ([`index.html`](../index.html))
 
 - `control-phase-3-scenario` — 동일 / id 제거 / 제목 수정.
@@ -158,6 +264,52 @@
 - **`getDomNodeAtPath(root, path)`** — `childNodes` 인덱스 체인.
 - **`applyPatches(domRoot, patches)`** — 순차 적용, `REPLACE_NODE` 가 `path:[]` 이면 새 루트 반환.
 - 지원 연산: `SET_TEXT`, `SET_PROP`, `REMOVE_PROP`, `REPLACE_CHILDREN`, `REPLACE_NODE`, `REMOVE_NODE`.
+
+### 시퀀스 다이어그램 (patch 실행: applyPatches)
+
+```mermaid
+sequenceDiagram
+  participant Apply as applyPatches(domRoot,patches[])
+  participant One as applyOnePatch(root,patch)
+  participant Get as getDomNodeAtPath(root,path)
+  participant DOM as RealDOM
+
+  Apply->>DOM: root = domRoot
+  loop for each patch in patches[]
+    Apply->>One: applyOnePatch(root,patch)
+    One->>Get: getDomNodeAtPath(root,patch.path)
+    Get-->>One: domNode
+    alt SET_TEXT
+      One->>DOM: domNode.nodeValue = patch.value
+    else SET_PROP/REMOVE_PROP
+      One->>DOM: setAttribute/removeAttribute
+    else REPLACE_CHILDREN
+      One->>DOM: clear children, then append vnodeToDom(children)
+    else REPLACE_NODE
+      One->>DOM: vnodeToDom(patch.vnode) then replaceChild
+    else REMOVE_NODE
+      One->>DOM: removeChild
+    end
+  end
+  Apply-->>Apply: return final root
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 `patch.js`의 핵심 실행 경로인 `applyPatches -> applyOnePatch`를 “patch op별 DOM 변경” 관점에서 풀어낸 것입니다.
+
+- `applyPatches`는 patches[]를 순서대로 돌며, 매번 `applyOnePatch`를 호출합니다.
+- 각 op는 `patch.path`를 기준으로 `getDomNodeAtPath`로 “실제 DOM의 타겟 노드”를 찾습니다.
+- `SET_TEXT`는 Text 노드의 `nodeValue`만 바꿔서 “국소 수정”을 수행합니다.
+- `SET_PROP`/`REMOVE_PROP`는 타겟 Element의 속성을 `setAttribute`/`removeAttribute`로 수정합니다.
+- `REPLACE_CHILDREN`는 타겟 Element의 자식을 모두 지우고, patch에 들어있는 children VNode들을 `vnodeToDom`으로 만들어 다시 붙입니다.
+- `REPLACE_NODE`는 타겟 노드(서브트리) 자체를 새 VNode로 만들고 `replaceChild`로 교체합니다.
+- `REMOVE_NODE`는 타겟 노드를 `removeChild`로 제거합니다.
+
+관찰 포인트는 “DOM 변경은 op 종류에 따라 크게 달라진다”는 점이고, 특히 `REPLACE_*` 계열은 내부적으로 `vnodeToDom`을 다시 사용해 새 노드를 생성한다는 점입니다.
+
+### 흐름 포인트
+- `path`가 “어디(노드 위치)”를, `op`가 “무엇(변경 방식)”을 결정한다.
+- 교체 계열(`REPLACE_*`)이 나오면 내부적으로 `vnodeToDom`이 다시 동작한다.
 
 ### 데모
 
@@ -185,6 +337,67 @@
 - **Patch:** `committed = history[historyIndex]`, `testVNode` 와 `diffVNode` → `applyPatches(realRoot, …)` — **실제 마운트의 첫 요소**만 갱신. 이후 `history` 에 `vnodeDeepClone(testVNode)` 푸시, 미래 분기 잘라냄.
 - **뒤로/앞으로:** `syncUIFromHistory` 로 `renderVNodeInto(realMount, …)` + `vnodeToHTMLString` 으로 textarea 동기화.
 
+### 시퀀스 다이어그램 (5단계: init + Patch + undo/redo)
+
+```mermaid
+sequenceDiagram
+  participant UI as phase5 UI
+  participant Sample as container-phase-1-sample DOM
+  participant VDOM as domToVNode/cloneVNodeStripIds/vnodeDeepClone
+  participant Hist as history[]
+  participant Real as container-phase-5-real-mount
+  participant TA as control-phase-5-test-html textarea
+  participant Diff as diffVNode
+  participant Patch as applyPatches
+
+  Note over UI,Real: initWorkshop()
+  UI->>Sample: read sample DOM
+  Sample->>VDOM: domToVNode(sample)
+  VDOM-->>UI: v0 (id stripped)
+  UI->>Hist: history=[deepClone(v0)]
+  UI->>Real: renderVNodeInto(realMount,snap)
+  UI->>TA: textarea= vnodeToHTMLString(snap)
+
+  Note over UI: Patch 버튼 클릭
+  UI->>Hist: committed = history[historyIndex]
+  UI->>TA: read textarea HTML
+  UI->>VDOM: htmlStringToRootVNode(textarea)
+  UI->>Diff: patches = diffVNode(committed,testVNode)
+  UI->>Real: applyPatches(realRoot,patches)
+  UI->>Hist: push(deepClone(testVNode)), truncate future
+  UI->>TA: textarea = vnodeToHTMLString(testVNode)
+
+  Note over UI: 뒤로/앞으로
+  UI->>Hist: historyIndex-- or ++
+  UI->>Real: renderVNodeInto(realMount,snap)
+  UI->>TA: textarea = vnodeToHTMLString(snap)
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 5단계 워크숍의 “상태 흐름”을 한 번에 보여줍니다. 핵심은 textarea 입력과 실제 DOM 변경의 타이밍 분리입니다.
+
+1) initWorkshop() 구간
+- `Sample` DOM을 읽어 `domToVNode`로 VNode를 만든 뒤, `cloneVNodeStripIds`로 id 충돌을 피한 스냅샷을 만들고, `history`에 deepClone으로 저장합니다.
+- 이어서 `renderVNodeInto(realMount, snap)`으로 실제 영역을 렌더하고,
+- `vnodeToHTMLString(snap)`으로 textarea 내용을 snapshot과 동기화합니다.
+
+2) Patch 버튼 클릭 구간
+- committed는 history의 현재 커밋 스냅샷입니다.
+- textarea의 문자열은 바로 DOM을 바꾸지 않고, `htmlStringToRootVNode`로 VNode 후보 testVNode로 바꿉니다(단일 루트 정책).
+- 그 다음 `diffVNode(committed, testVNode)`로 patches를 계산하고,
+- `applyPatches(realRoot, patches)`로 “실제 영역(real-mount)만” 갱신합니다.
+- 마지막으로 history를 커밋하고, textarea는 `vnodeToHTMLString(testVNode)`로 정규화된 snapshot 문자열로 다시 맞춥니다.
+
+3) 뒤로/앞으로 구간
+- undo/redo는 다시 diff/patch를 하지 않습니다.
+- `historyIndex`만 이동한 뒤, 저장된 스냅샷을 `renderVNodeInto`로 다시 렌더해서 실제/textarea를 함께 복원합니다.
+
+관찰 포인트는 “textarea 변경 ≠ 즉시 DOM 변경”이고, 실제 DOM 변경은 항상 `Patch`에서만 발생한다는 점입니다.
+
+### 흐름 포인트
+- textarea 입력은 “new VNode 스냅샷 후보”를 만들 뿐, 실제 DOM 변경은 Patch 단계에서 발생한다.
+- undo/redo는 diff/patch 재계산이 아니라, history 스냅샷을 다시 렌더한다.
+
 ### 데모 (`index.html`)
 
 - `container-phase-5-real-mount`, `control-phase-5-test-html`, `control-phase-5-patch|back|forward`, `output-phase-5-status`.
@@ -209,6 +422,41 @@
 - 브라우저 내 소형 테스트 러너(`js/unit-tests.js`)로 `domToVNode / vnodeToDom / diffVNode / applyPatches` 핵심 케이스를 검증.
 - 웹페이지(`data-phase="6"`)에서 PASS/FAIL과 실패 로그를 함께 표시.
 - README는 발표용 데모 시나리오/아키텍처/한계를 정리하는 단계로 남아 있다.
+
+### 시퀀스 다이어그램 (6단계: 단위테스트 실행)
+
+```mermaid
+sequenceDiagram
+  participant Page as browser page
+  participant Runner as unit-tests.js
+  participant Case as runCase()
+  participant Assert as assert()
+  participant UI as output-phase-6-status/log
+
+  Page->>Runner: load (or control-phase-6-run 클릭)
+  Runner->>Case: for each test case
+  Case->>Assert: assert(condition,message)
+  alt pass
+    Case-->>Runner: pass
+  else fail
+    Case-->>Runner: fail(error)
+  end
+  Runner->>UI: PASS/FAIL 요약 + 로그 출력
+```
+
+### 다이어그램 해설 (읽는 법)
+이 다이어그램은 6단계의 “웹페이지 내부 단위테스트 실행” 흐름을 보여줍니다.
+
+- `unit-tests.js`는 페이지 로드 시 자동 실행되고, `control-phase-6-run` 버튼으로 재실행도 가능합니다.
+- 각 테스트 케이스는 `runCase(testName, fn)` 형태로 래핑되어, 실행 중 예외가 발생하면 FAIL로 잡습니다(try/catch).
+- `assert(condition, message)`는 조건이 false면 throw하여 실패를 유도합니다.
+- 케이스가 모두 끝나면 PASS/FAIL 합계와 실패한 테스트의 로그(에러 메시지/스택)를 `output-phase-6-status`, `output-phase-6-log`에 출력합니다.
+
+관찰 포인트는 “검증이 페이지의 일부로 바로 보인다”는 점입니다. 그래서 발표 중에도 개발자 도구 없이 FAIL 지점을 빠르게 확인할 수 있습니다.
+
+### 흐름 포인트
+- 외부 테스트 프레임워크 없이 try/catch로 PASS/FAIL을 만든다.
+- 결과를 웹페이지에 즉시 표시해 “검증이 데모의 일부”가 되게 한다.
 
 ---
 
