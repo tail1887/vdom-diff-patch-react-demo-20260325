@@ -245,6 +245,7 @@ sequenceDiagram
 ### 데모 ([`index.html`](../index.html))
 
 - `control-phase-3-scenario` — 동일 / id 제거 / 제목 수정.
+- `output-phase-3-vnode-old` / `output-phase-3-vnode-new` — diff에 넣는 이전·이후 VNode JSON.
 - `output-phase-3-patches` — `patchCount`, `patches`.
 
 ### 알려진 한계

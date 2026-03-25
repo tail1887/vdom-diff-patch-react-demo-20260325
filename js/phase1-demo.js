@@ -3,7 +3,7 @@
  *
  * ID 규칙은 index.html 주석과 동일:
  * - container-phase-1-sample, output-phase-1-*, container-phase-2-mount,
- *   control-phase-3-scenario, output-phase-3-patches,
+ *   control-phase-3-scenario, output-phase-3-vnode-old/new, output-phase-3-patches,
  *   control-phase-4-*, output-phase-4-status, container-phase-4-mount
  */
 
@@ -112,14 +112,22 @@ function buildNextTree(tree, scenario) {
   return vnodeDeepClone(tree);
 }
 
-function runDiffDemo(tree, scenario, outEl) {
-  if (!outEl || typeof diffVNode !== 'function') {
-    if (outEl) outEl.textContent = '// diff.js 가 로드되지 않았습니다.\n';
+/**
+ * @param {object} tree - 1단계 샘플에서 만든 기준 VNode
+ * @param {string} scenario
+ * @param {{ old?: HTMLElement, new?: HTMLElement, patches: HTMLElement }} outs
+ */
+function runDiffDemo(tree, scenario, outs) {
+  var outPatches = outs && outs.patches;
+  if (!outPatches || typeof diffVNode !== 'function') {
+    if (outPatches) outPatches.textContent = '// diff.js 가 로드되지 않았습니다.\n';
     return;
   }
   var next = buildNextTree(tree, scenario);
   var patches = diffVNode(tree, next);
-  outEl.textContent = JSON.stringify(
+  if (outs.old) outs.old.textContent = JSON.stringify(tree, null, 2);
+  if (outs.new) outs.new.textContent = JSON.stringify(next, null, 2);
+  outPatches.textContent = JSON.stringify(
     { scenario: scenario, patchCount: patches.length, patches: patches },
     null,
     2
@@ -206,6 +214,8 @@ function applyPhase4Patches(vnodeTree, scenario, statusEl) {
   var outOuter = document.getElementById('output-phase-1-outer-html');
   var outOutline = document.getElementById('output-phase-1-tree-outline');
   var mount2 = document.getElementById('container-phase-2-mount');
+  var outDiffOld = document.getElementById('output-phase-3-vnode-old');
+  var outDiffNew = document.getElementById('output-phase-3-vnode-new');
   var outDiff = document.getElementById('output-phase-3-patches');
   var diffSelect = document.getElementById('control-phase-3-scenario');
   var btnReset4 = document.getElementById('control-phase-4-reset');
@@ -230,7 +240,11 @@ function applyPhase4Patches(vnodeTree, scenario, statusEl) {
 
   function refreshDiff() {
     var sc = diffSelect ? diffSelect.value : 'stripIds';
-    runDiffDemo(tree, sc, outDiff);
+    runDiffDemo(tree, sc, {
+      old: outDiffOld,
+      new: outDiffNew,
+      patches: outDiff
+    });
   }
 
   if (diffSelect) {

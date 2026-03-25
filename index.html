@@ -116,7 +116,9 @@
           <span class="demo-phase__badge" aria-hidden="true">3</span>
           <div class="demo-phase__headings">
             <h2 class="demo-phase__title" id="heading-phase-3">Diff</h2>
-            <p class="demo-phase__desc"><code>diffVNode</code> → <code>output-phase-3-patches</code></p>
+            <p class="demo-phase__desc">
+              이전/이후 VNode JSON + <code>output-phase-3-patches</code>
+            </p>
           </div>
         </header>
         <div class="diff-toolbar">
@@ -128,13 +130,24 @@
           </select>
         </div>
         <p id="help-phase-3-patches" class="panel-note diff-help">
+          왼쪽·가운데는 diff에 넣는 <strong>이전/이후 VNode 스냅샷</strong>, 오른쪽은 <code>diffVNode</code>가 만든 패치 목록입니다.
           연산 종류: <code>SET_TEXT</code>, <code>SET_PROP</code>, <code>REMOVE_PROP</code> 등 — <code>js/diff.js</code> 참고.
           <strong>id 제거 복제</strong>는 글자·색은 그대로이고 <strong>속성만</strong> 바뀌어서 화면은 거의 같아 보입니다.
           패치 개수는 <code>patchCount</code>로 확인하세요. 이 셀렉트는 <strong>2단계 박스에는 반영되지 않고</strong> 3·4단계만 바뀝니다.
         </p>
-        <div class="code-wrap code-wrap--grow code-wrap--diff">
-          <div class="code-wrap__bar"><span class="code-wrap__label">Patches</span></div>
-          <pre id="output-phase-3-patches" class="code-block code-block--diff"></pre>
+        <div class="diff-compare-grid" role="group" aria-label="Diff 비교: 이전 VNode, 이후 VNode, 패치 목록">
+          <div class="code-wrap code-wrap--grow code-wrap--diff">
+            <div class="code-wrap__bar"><span class="code-wrap__label">이전 VNode (old)</span></div>
+            <pre id="output-phase-3-vnode-old" class="code-block code-block--diff" aria-label="diff 이전 VNode JSON"></pre>
+          </div>
+          <div class="code-wrap code-wrap--grow code-wrap--diff">
+            <div class="code-wrap__bar"><span class="code-wrap__label">이후 VNode (new)</span></div>
+            <pre id="output-phase-3-vnode-new" class="code-block code-block--diff" aria-label="diff 이후 VNode JSON"></pre>
+          </div>
+          <div class="code-wrap code-wrap--grow code-wrap--diff">
+            <div class="code-wrap__bar"><span class="code-wrap__label">Patches</span></div>
+            <pre id="output-phase-3-patches" class="code-block code-block--diff"></pre>
+          </div>
         </div>
       </section>
 

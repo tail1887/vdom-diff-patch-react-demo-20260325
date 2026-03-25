@@ -51,7 +51,7 @@
 - 1단계 VNode를 `container-phase-2-mount`에 렌더링합니다.
 
 ### 3단계: Diff
-- `control-phase-3-scenario`로 비교 시나리오를 바꾸고, `output-phase-3-patches`에 patches 결과를 확인합니다.
+- `control-phase-3-scenario`로 비교 시나리오를 바꾸고, `output-phase-3-vnode-old` / `output-phase-3-vnode-new`에 diff에 들어가는 두 스냅샷을, `output-phase-3-patches`에 patches 결과를 확인합니다.
 
 ### 4단계: Patch
 - Shadow DOM 호스트(`container-phase-4-mount`) 안에서 패치 적용 결과를 확인합니다.
