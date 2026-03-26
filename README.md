@@ -54,7 +54,7 @@
 - `control-phase-3-scenario`로 비교 시나리오를 바꾸고, `output-phase-3-vnode-old` / `output-phase-3-vnode-new`에 diff에 들어가는 두 스냅샷을, `output-phase-3-patches`에 patches 결과를 확인합니다.
 
 ### 4단계: Patch
-- Shadow DOM 호스트(`container-phase-4-mount`) 안에서 패치 적용 결과를 확인합니다.
+- 왼쪽은 Shadow DOM 호스트(`container-phase-4-mount`) 시각 영역, 오른쪽은 Shadow 안 루트의 `outerHTML`(`output-phase-4-shadow-html`)으로 id 제거 등을 **문자열에서** 바로 비교합니다.
 
 ### 5단계: 통합 워크숍(실제/테스트 + 히스토리)
 - 왼쪽(`container-phase-5-real-mount`): 실제 영역은 **Patch만**으로 갱신

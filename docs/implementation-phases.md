@@ -315,7 +315,7 @@ sequenceDiagram
 ### 데모
 
 - `container-phase-4-mount` 가 **ShadowRoot 호스트**; 안쪽 div 에 이전 VNode(id 포함)를 그린 뒤 패치 적용 → **문서 1단계 샘플과 `id` 충돌 없음**.
-- `control-phase-4-reset` / `control-phase-4-apply`, `output-phase-4-status`.
+- `control-phase-4-reset` / `control-phase-4-apply`, `output-phase-4-status`, `output-phase-4-shadow-html`(Shadow 루트 `outerHTML` — 발표 시 id 유무 확인용).
 
 ### 알려진 한계
 

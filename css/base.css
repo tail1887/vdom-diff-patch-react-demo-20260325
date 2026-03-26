@@ -227,6 +227,44 @@ body {
   font-weight: 500;
 }
 
+.phase4-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 900px) {
+  .phase4-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.phase4-split__visual {
+  min-width: 0;
+}
+
+.phase4-split__html {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.phase4-split__html .code-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.phase4-split__html .code-block {
+  flex: 1;
+  max-height: min(38vh, 420px);
+  min-height: 140px;
+  overflow: auto;
+}
+
 .sample-box--patch-host {
   min-height: 120px;
   border-style: solid;

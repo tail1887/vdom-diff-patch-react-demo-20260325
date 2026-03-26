@@ -163,20 +163,33 @@
           </div>
         </header>
         <p class="demo-phase__note panel-note">
-          <strong>초기화</strong> 후 <strong>패치 적용</strong>을 누르세요. 변경 확인: 개발자 도구(F12) →
-          <code>container-phase-4-mount</code> → <code>#shadow-root</code> → 요소 선택 →
-          <strong>id 속성</strong>이 사라졌는지 봅니다. 아래 상태 줄에도 id 개수(전→후)를 찍습니다.
+          <strong>초기화</strong> 후 <strong>패치 적용</strong>을 누르세요. 오른쪽 패널은 Shadow 안 루트의
+          <code>outerHTML</code>이라 문자열에서 <strong>id</strong> 유무를 바로 비교할 수 있습니다(개발자 도구로
+          shadow-root를 열어도 동일).
         </p>
         <div class="phase4-toolbar">
           <button type="button" id="control-phase-4-reset" class="btn-phase4">초기화 (이전 VNode 기준으로 다시 그리기)</button>
           <button type="button" id="control-phase-4-apply" class="btn-phase4 btn-phase4--primary">현재 시나리오 패치 적용</button>
         </div>
         <p id="output-phase-4-status" class="panel-note phase4-status" aria-live="polite"></p>
-        <div
-          id="container-phase-4-mount"
-          class="sample-box sample-box--patch-host"
-          title="ShadowRoot 호스트 — 내부 DOM 은 개발자 도구에서 shadow-root 로 확인"
-        ></div>
+        <div class="phase4-split">
+          <div class="phase4-split__visual">
+            <div
+              id="container-phase-4-mount"
+              class="sample-box sample-box--patch-host"
+              title="ShadowRoot 호스트 — 내부 DOM 은 개발자 도구에서 shadow-root 로 확인"
+            ></div>
+          </div>
+          <div class="phase4-split__html">
+            <div class="code-wrap code-wrap--grow">
+              <div class="code-wrap__bar">
+                <span class="code-wrap__label">Shadow 안 HTML</span>
+                <span class="code-wrap__hint">id 제거 시 문자열에서 사라짐</span>
+              </div>
+              <pre id="output-phase-4-shadow-html" class="code-block code-block--sm" aria-label="Shadow 루트 outerHTML"></pre>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ========== 5단계: 통합 UI · 히스토리 (과제 플로우) ========== -->

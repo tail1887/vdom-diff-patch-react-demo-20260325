@@ -4,7 +4,7 @@
  * ID 규칙은 index.html 주석과 동일:
  * - container-phase-1-sample, output-phase-1-*, container-phase-2-mount,
  *   control-phase-3-scenario, output-phase-3-vnode-old/new, output-phase-3-patches,
- *   control-phase-4-*, output-phase-4-status, container-phase-4-mount
+ *   control-phase-4-*, output-phase-4-status, output-phase-4-shadow-html, container-phase-4-mount
  */
 
 /** 4단계 Shadow 안에서만 쓰는 최소 스타일(외부 base.css 와 유사하게) */
@@ -163,10 +163,23 @@ function countIdAttributes(domNode) {
   return n;
 }
 
+function updatePhase4ShadowHtml() {
+  var out = document.getElementById('output-phase-4-shadow-html');
+  if (!out) return;
+  var inner = getPhase4ShadowInner();
+  var root = inner && inner.firstElementChild;
+  if (!root) {
+    out.textContent = '(초기화 후 Shadow 안 HTML이 표시됩니다.)';
+    return;
+  }
+  out.textContent = root.outerHTML;
+}
+
 function resetPhase4Dom(vnodeTree) {
   var inner = getPhase4ShadowInner();
   if (!inner || typeof renderVNodeInto !== 'function') return false;
   renderVNodeInto(inner, vnodeDeepClone(vnodeTree));
+  updatePhase4ShadowHtml();
   return true;
 }
 
@@ -190,10 +203,12 @@ function applyPhase4Patches(vnodeTree, scenario, statusEl) {
       statusEl.textContent =
         '패치 0개 — 화면/속성 변화 없음(시나리오: ' + scenario + '). Shadow 안 id 는 ' + beforeIds + '개 그대로.';
     }
+    updatePhase4ShadowHtml();
     return;
   }
   applyPatches(root, patches);
   var afterIds = countIdAttributes(root);
+  updatePhase4ShadowHtml();
   if (statusEl) {
     statusEl.textContent =
       '적용 완료 — 패치 ' +
@@ -221,6 +236,7 @@ function applyPhase4Patches(vnodeTree, scenario, statusEl) {
   var btnReset4 = document.getElementById('control-phase-4-reset');
   var btnApply4 = document.getElementById('control-phase-4-apply');
   var status4 = document.getElementById('output-phase-4-status');
+  var outPhase4Html = document.getElementById('output-phase-4-shadow-html');
 
   if (!root || !outVdom) return;
 
@@ -260,10 +276,17 @@ function applyPhase4Patches(vnodeTree, scenario, statusEl) {
         var idn = r ? countIdAttributes(r) : 0;
         if (status4) {
           status4.textContent =
-            '초기화됨 — Shadow 안 id 속성 ' + idn + '개. “패치 적용”으로 id 제거 시나리오를 시험하세요.';
+            '초기화됨 — Shadow 안 id 속성 ' + idn + '개. 오른쪽 HTML에서 id 문자열을 확인한 뒤 “패치 적용”을 눌러보세요.';
         }
       }
     });
+  }
+
+  if (outPhase4Html && typeof resetPhase4Dom === 'function' && resetPhase4Dom(tree)) {
+    if (status4) {
+      status4.textContent =
+        '4단계 준비됨 — 오른쪽 패널에 Shadow 안 HTML이 표시됩니다. id 제거 시나리오는 패치 적용 후 문자열에서 id가 사라집니다.';
+    }
   }
 
   if (btnApply4) {
