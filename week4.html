@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+  Week 4 전용 페이지 — 단계별 데모 + 단위테스트
+  스크립트: vdom → diff → patch → mini-react → week4-demo → week4-unit-tests
+-->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 4 · 미니 React (단계별 데모)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="주차 데모 이동">
+      <div class="site-nav__inner">
+        <span class="site-nav__label">데모</span>
+        <a href="index.html" class="site-nav__link">Week 3 · VDOM</a>
+        <a href="week4.html" class="site-nav__link site-nav__link--current" aria-current="page">Week 4 · 미니 React</a>
+      </div>
+    </nav>
+
+    <main class="page">
+      <header class="page-head">
+        <p class="eyebrow">Week 4 · 수요 코딩회</p>
+        <h1 class="page-title">단계별 데모 <span class="page-title__sep">·</span> Hooks <span class="page-title__sep">·</span> diff / patch</h1>
+        <p class="page-lead">
+          아래는 구현 순서에 맞춘 <strong>데모 단계</strong>입니다. 루트에서만 훅을 쓰고, 자식은
+          <code>h(함수, props)</code> 무상태 컴포넌트입니다. 과제의「입력·클릭에 따라 화면 변경」은
+          <strong>2단계 이상</strong>에서 확인할 수 있습니다.
+        </p>
+        <div class="hint-card" role="note">
+          <span class="hint-card__tag">코드</span>
+          <p class="hint-card__text">
+            <code>js/mini-react.js</code> · <code>js/week4-demo.js</code> · 하단 <code>week4-unit-tests.js</code>
+          </p>
+        </div>
+      </header>
+
+      <!-- 1단계: 마운트 (훅 없음) -->
+      <section class="demo-phase" data-w4="1" aria-labelledby="heading-w4-1">
+        <header class="demo-phase__header demo-phase__header--accent-1">
+          <span class="demo-phase__badge" aria-hidden="true">1</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-1">FunctionComponent + 첫 마운트</h2>
+            <p class="demo-phase__desc">
+              <code>mount(container)</code> → <code>render()</code>가 VNode를 만들고 <code>vnodeToDom</code>으로 붙입니다.
+            </p>
+          </div>
+        </header>
+        <p class="demo-phase__note panel-note">
+          훅 없이 <code>h</code> / <code>hText</code>만 사용합니다. 상호작용은 <strong>2단계</strong>부터입니다.
+        </p>
+        <div id="container-week4-1-mount" class="sample-box week4-mount"></div>
+      </section>
+
+      <!-- 2단계: useState -->
+      <section class="demo-phase" data-w4="2" aria-labelledby="heading-w4-2">
+        <header class="demo-phase__header demo-phase__header--accent-2">
+          <span class="demo-phase__badge" aria-hidden="true">2</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-2">useState → update → diff → patch</h2>
+            <p class="demo-phase__desc">
+              <code>setState</code>가 microtask에서 <code>update</code>를 호출해 DOM을 최소 변경으로 갱신합니다.
+            </p>
+          </div>
+        </header>
+        <div id="container-week4-2-mount" class="sample-box week4-mount"></div>
+      </section>
+
+      <!-- 3단계: useMemo -->
+      <section class="demo-phase" data-w4="3" aria-labelledby="heading-w4-3">
+        <header class="demo-phase__header demo-phase__header--accent-3">
+          <span class="demo-phase__badge" aria-hidden="true">3</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-3">useMemo</h2>
+            <p class="demo-phase__desc">
+              <code>count</code>에만 의존하는 값과, 리렌더만 일으키는 <code>tick</code>을 분리해 캐시 동작을 눈으로 구분합니다.
+            </p>
+          </div>
+        </header>
+        <div id="container-week4-3-mount" class="sample-box week4-mount"></div>
+      </section>
+
+      <!-- 4단계: useEffect -->
+      <section class="demo-phase" data-w4="4" aria-labelledby="heading-w4-4">
+        <header class="demo-phase__header demo-phase__header--accent-4">
+          <span class="demo-phase__badge" aria-hidden="true">4</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-4">useEffect</h2>
+            <p class="demo-phase__desc">
+              커밋 직후 microtask에서 실행됩니다. 아래 문구는 <code>theme</code> / <code>msg</code> 상태에 따라 바뀝니다.
+            </p>
+          </div>
+        </header>
+        <div id="container-week4-4-mount" class="sample-box week4-mount"></div>
+        <p id="output-week4-4-effect" class="panel-note week4-effect-line" aria-live="polite"></p>
+      </section>
+
+      <!-- 5단계: 무상태 자식 + 통합 -->
+      <section class="demo-phase" data-w4="5" aria-labelledby="heading-w4-5">
+        <header class="demo-phase__header demo-phase__header--accent-patch">
+          <span class="demo-phase__badge" aria-hidden="true">5</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-5">Stateless 자식 + Lifting state up</h2>
+            <p class="demo-phase__desc">
+              <code>h(Header, props)</code> — 자식은 훅 없이 props만 받고, 상태는 루트에만 둡니다.
+            </p>
+          </div>
+        </header>
+        <div id="container-week4-5-mount" class="sample-box week4-mount"></div>
+        <p id="output-week4-5-effect" class="panel-note week4-effect-line" aria-live="polite"></p>
+      </section>
+
+      <!-- 단위테스트 -->
+      <section class="demo-phase demo-phase--week4-tests" data-w4="tests" aria-labelledby="heading-w4-tests">
+        <header class="demo-phase__header demo-phase__header--accent-5">
+          <span class="demo-phase__badge" aria-hidden="true">T</span>
+          <div class="demo-phase__headings">
+            <h2 class="demo-phase__title" id="heading-w4-tests">단위테스트 (자동 검증)</h2>
+            <p class="demo-phase__desc">
+              <code>js/week4-unit-tests.js</code> — 로드 시 1회 실행, 버튼으로 재실행 (microtask 순서 포함)
+            </p>
+          </div>
+        </header>
+        <div class="phase5-toolbar">
+          <button type="button" id="control-phase-7-run" class="btn-phase5 btn-phase5--primary">
+            Week4 테스트 실행
+          </button>
+        </div>
+        <p id="output-phase-7-status" class="panel-note" aria-live="polite"></p>
+        <div class="code-wrap code-wrap--grow">
+          <div class="code-wrap__bar">
+            <span class="code-wrap__label">테스트 로그</span>
+          </div>
+          <pre id="output-phase-7-log" class="code-block code-block--tall"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/vdom.js"></script>
+    <script src="js/diff.js"></script>
+    <script src="js/patch.js"></script>
+    <script src="js/mini-react.js"></script>
+    <script src="js/week4-demo.js"></script>
+    <script src="js/week4-unit-tests.js"></script>
+  </body>
+</html>

@@ -14,8 +14,9 @@
 
 ## 빠른 시작
 
-1. 이 폴더에서 `index.html`을 브라우저로 실행합니다.
-2. 단계별 UI를 순서대로 살펴보세요.
+1. 이 폴더에서 `index.html`(Week 3) 또는 `week4.html`(Week 4)을 브라우저로 실행합니다.
+2. 상단 메뉴로 두 페이지를 오갈 수 있습니다.
+3. Week 3는 단계별 UI를 순서대로, Week 4는 미니 React 데모·테스트만 확인하면 됩니다.
 
 권장 사용:
 - 개발자 도구(F12)에서 `Elements` 탭으로 DOM 변경을 확인
@@ -25,7 +26,8 @@
 
 ## 폴더/파일 구성
 
-- `index.html`: 1~6단계 데모/워크숍 UI
+- `index.html`: Week 3 — 1~6단계 데모/워크숍 UI
+- `week4.html`: Week 4 — 미니 React 데모·단위테스트 전용
 - `css/base.css`: 데모 레이아웃/스타일
 - `js/vdom.js`: `domToVNode`, `vnodeToDom`, `renderVNodeInto`, `vnodeToHTMLString`
 - `js/diff.js`: `diffVNode`(patches 계산)
@@ -33,12 +35,13 @@
 - `js/phase1-demo.js`: 1~4단계 데모 UI 연동
 - `js/phase5-workshop.js`: 5단계 통합 워크숍(실제/테스트 + 히스토리)
 - `js/unit-tests.js`: 6단계 브라우저 내 단위테스트 러너
+- `js/mini-react.js`: Week 4 — `FunctionComponent`, `useState` / `useEffect` / `useMemo`, `h` / `hText`
+- `js/week4-demo.js`: Week 4 미니 React 데모(`week4.html`)
+- `js/week4-unit-tests.js`: Week 4 단위테스트(`week4.html`)
 
-문서:
-- `docs/requirements.md`: 요구사항/중점 포인트
-- `docs/implementation-phases.md`: 구현 단계 정리
-- `docs/VDOM_Diff_Patch_Study.md`: 단계별 학습 문서
-- `docs/VDOM_Diff_Patch_Presentation_Script*.md`: 발표 대본
+문서(주차별): [`docs/README.md`](docs/README.md)
+- Week 3 (VDOM·Diff·Patch): [`docs/week03-vdom/`](docs/week03-vdom/) — 요구사항, 구현 단계, 학습·발표 대본
+- Week 4 (컴포넌트·훅): [`docs/week04-mini-react/`](docs/week04-mini-react/) — [`requirements.md`](docs/week04-mini-react/requirements.md), [`implementation-phases.md`](docs/week04-mini-react/implementation-phases.md)
 
 ---
 
@@ -66,6 +69,10 @@
 ### 6단계: 단위테스트
 - 페이지 로드 시 자동 실행되며 PASS/FAIL과 로그가 표시됩니다.
 - `테스트 실행` 버튼으로 재실행할 수 있습니다.
+
+### Week 4 페이지 (`week4.html`)
+- 상단 메뉴 **Week 4 · 미니 React** 또는 `week4.html`을 직접 엽니다.
+- **1~5단계** 데모(마운트 → useState → useMemo → useEffect → 무상태 자식)를 순서대로 두고, 하단에 **Week4 테스트 실행**이 있습니다.
 
 ---
 

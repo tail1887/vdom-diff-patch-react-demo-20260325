@@ -75,16 +75,24 @@ function applyOnePatch(root, patch) {
     case 'SET_PROP': {
       var el = getDomNodeAtPath(root, patch.path);
       if (el && el.nodeType === Node.ELEMENT_NODE) {
-        // 속성이 없으면 추가, 있으면 덮어씀
-        el.setAttribute(patch.name, patch.value == null ? '' : String(patch.value));
+        if (typeof patch.value === 'function' && /^on/i.test(patch.name)) {
+          if (typeof vnodeAttachPropHandler === 'function') {
+            vnodeAttachPropHandler(el, patch.name, patch.value);
+          }
+        } else {
+          el.setAttribute(patch.name, patch.value == null ? '' : String(patch.value));
+        }
       }
       return null;
     }
     case 'REMOVE_PROP': {
       var el2 = getDomNodeAtPath(root, patch.path);
       if (el2 && el2.nodeType === Node.ELEMENT_NODE) {
-        // 존재하지 않는 속성 제거 요청이어도 DOM API 가 안전하게 무시한다.
-        el2.removeAttribute(patch.name);
+        if (/^on/i.test(patch.name) && typeof vnodeDetachPropHandler === 'function') {
+          vnodeDetachPropHandler(el2, patch.name);
+        } else {
+          el2.removeAttribute(patch.name);
+        }
       }
       return null;
     }

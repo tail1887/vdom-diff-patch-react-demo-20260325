@@ -212,6 +212,35 @@ function vnodeToDom(vnode) {
 }
 
 /**
+ * 이벤트 prop(onClick 등)은 함수 참조로 전달될 수 있다(Week 4 미니 React).
+ * DOM 속성이 아니라 addEventListener 로 붙이며, 패치 단계에서도 동일 규칙을 쓴다.
+ *
+ * @param {Element} el
+ * @param {string} propKey — 예: "onClick"
+ * @param {function} fn
+ */
+function vnodeAttachPropHandler(el, propKey, fn) {
+  if (!el || el.nodeType !== Node.ELEMENT_NODE || typeof fn !== 'function') return;
+  el._miniPropHandlers = el._miniPropHandlers || {};
+  var prev = el._miniPropHandlers[propKey];
+  var ev = String(propKey).replace(/^on/i, '').toLowerCase();
+  if (prev && prev.ev) el.removeEventListener(prev.ev, prev.fn);
+  el._miniPropHandlers[propKey] = { ev: ev, fn: fn };
+  el.addEventListener(ev, fn);
+}
+
+/**
+ * @param {Element} el
+ * @param {string} propKey
+ */
+function vnodeDetachPropHandler(el, propKey) {
+  if (!el || !el._miniPropHandlers || !el._miniPropHandlers[propKey]) return;
+  var p = el._miniPropHandlers[propKey];
+  if (p && p.ev) el.removeEventListener(p.ev, p.fn);
+  delete el._miniPropHandlers[propKey];
+}
+
+/**
  * 요소 VNode → Element
  *
  * @param {object} vnode — { type, props, children }
@@ -223,6 +252,10 @@ function vnodeElementToDom(vnode) {
     if (!Object.prototype.hasOwnProperty.call(props, key)) continue;
     var val = props[key];
     if (val === false || val == null) continue;
+    if (typeof val === 'function' && /^on/i.test(key)) {
+      vnodeAttachPropHandler(el, key, val);
+      continue;
+    }
     if (val === true) {
       el.setAttribute(key, '');
     } else {

@@ -6,13 +6,13 @@
   - output-phase-N-*     — 읽기 전용 출력(pre 등)
   - control-phase-N-*    — 입력(버튼, select)
 
-  스크립트: vdom.js → diff.js → patch.js → phase1-demo.js → phase5-workshop.js
+  스크립트: vdom → diff → patch → phase1/5 → unit-tests  (Week 4는 week4.html)
 -->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VDOM 데모 · 1~5단계 (워크숍 UI · 히스토리)</title>
+    <title>Week 3 · VDOM · Diff · Patch (1~6단계)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,10 +22,17 @@
     <link rel="stylesheet" href="css/base.css" />
   </head>
   <body>
+    <nav class="site-nav" aria-label="주차 데모 이동">
+      <div class="site-nav__inner">
+        <span class="site-nav__label">데모</span>
+        <a href="index.html" class="site-nav__link site-nav__link--current" aria-current="page">Week 3 · VDOM</a>
+        <a href="week4.html" class="site-nav__link">Week 4 · 미니 React</a>
+      </div>
+    </nav>
     <main class="page">
       <header class="page-head">
         <p class="eyebrow">Virtual DOM · 수요 코딩회 데모</p>
-        <h1 class="page-title">DOM ↔ VNode · Diff · Patch <span class="page-title__sep">·</span> 1~5단계</h1>
+        <h1 class="page-title">DOM ↔ VNode · Diff · Patch <span class="page-title__sep">·</span> 1~6단계</h1>
         <p class="page-lead">
           <strong>5단계</strong>는 과제 형태의 <strong>실제 영역</strong>(패치만 적용) +
           <strong>테스트 영역</strong>(HTML 편집) + <strong>Patch / 뒤로 / 앞으로</strong> 와 VNode 히스토리입니다.

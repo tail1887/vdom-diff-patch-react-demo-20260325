@@ -74,7 +74,7 @@
 
 ## 이 레포 구현 현황과의 대응 (참고)
 
-| 요구사항 | 현재 레포 (`docs/implementation-phases.md` 참고) |
+| 요구사항 | 현재 레포 (`implementation-phases.md` 참고) |
 |----------|---------------------------------------------------|
 | DOM → VDOM | ✅ `js/vdom.js` — `domToVNode` |
 | VDOM → DOM | ✅ `vnodeToDom`, `renderVNodeInto` + `container-phase-2-mount` |
