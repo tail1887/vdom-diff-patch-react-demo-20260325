@@ -47,16 +47,50 @@
         <header class="demo-phase__header demo-phase__header--accent-1">
           <span class="demo-phase__badge" aria-hidden="true">1</span>
           <div class="demo-phase__headings">
-            <h2 class="demo-phase__title" id="heading-w4-1">FunctionComponent + 첫 마운트</h2>
+            <h2 class="demo-phase__title" id="heading-w4-1">첫 마운트 — 컴포넌트를 화면에 한 번 붙이기</h2>
             <p class="demo-phase__desc">
-              <code>mount(container)</code> → <code>render()</code>가 VNode를 만들고 <code>vnodeToDom</code>으로 붙입니다.
+              <strong>무슨 단계인가:</strong> “화면 조각”을 나타내는 함수(<code>renderFn</code>)를 실행해 가상 트리(VNode)를 만든 뒤, Week 3의 <code>vnodeToDom</code>으로 진짜 DOM을 만들어 컨테이너에 넣습니다. 이걸 묶는 진입점이 <code>FunctionComponent</code>의 <code>mount(container)</code>입니다. 아래 데모 박스 안에 흐름이 그림으로 있습니다.
             </p>
           </div>
         </header>
         <p class="demo-phase__note panel-note">
-          훅 없이 <code>h</code> / <code>hText</code>만 사용합니다. 상호작용은 <strong>2단계</strong>부터입니다.
+          훅 없이 <code>h</code> / <code>hText</code>만 사용합니다. 버튼으로 바뀌는 건 <strong>2단계</strong>부터입니다.
         </p>
         <div id="container-week4-1-mount" class="sample-box week4-mount"></div>
+        <details class="week4-code-guide">
+          <summary>실제 코드 보기 · 1단계(첫 마운트)</summary>
+          <p class="panel-note week4-code-guide__note">
+            <strong>container</strong>는 서버에서 오는 값이 아니라, 이 페이지의 DOM에서
+            <code>document.getElementById('container-week4-1-mount')</code>로 찾은 div 요소입니다.
+            그 요소를 <code>mount(container)</code>에 넘겨서 첫 렌더 결과를 붙입니다.
+          </p>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/week4-demo.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">mountIf(
+  document.getElementById('container-week4-1-mount'), // HTML에 있는 마운트 대상 div
+  function Week4Phase1() { // 렌더 함수(renderFn)
+    return h('div', { class: 'week4-app week4-app--phase1' }, [ /* ... */ ]); // VNode 트리 반환
+  }
+);
+            </pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/mini-react.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">FunctionComponent.prototype.mount = function (container) {
+  this.container = container; // 이후 update에서도 같은 컨테이너 사용
+  activeComponent = this; // 지금 훅이 바라볼 컴포넌트 지정
+  var vnode = this.renderFn(); // renderFn 실행 -> 새 VNode
+  activeComponent = null; // 렌더 끝났으니 활성 표시 해제
+  container.replaceChildren(); // 컨테이너 비우기(첫 마운트)
+  var n = vnodeToDom(vnode); // VNode -> 실제 DOM 노드
+  if (n) container.appendChild(n); // 화면에 붙이기
+};</pre>
+          </div>
+        </details>
       </section>
 
       <!-- 2단계: useState -->
@@ -64,13 +98,43 @@
         <header class="demo-phase__header demo-phase__header--accent-2">
           <span class="demo-phase__badge" aria-hidden="true">2</span>
           <div class="demo-phase__headings">
-            <h2 class="demo-phase__title" id="heading-w4-2">useState → update → diff → patch</h2>
+            <h2 class="demo-phase__title" id="heading-w4-2">상태 — 바뀌면 같은 규칙으로 다시 그리기</h2>
             <p class="demo-phase__desc">
-              <code>setState</code>가 microtask에서 <code>update</code>를 호출해 DOM을 최소 변경으로 갱신합니다.
+              <strong>무슨 단계인가:</strong> <code>useState</code>로 “기억할 값”과 “바꾸는 함수”를 둡니다. setter(<code>setState</code>)가 호출되면 나중에 <code>update()</code>가 돌아가고, 그 안에서 <code>diffVNode</code> → <code>applyPatches</code>로 DOM만 최소한 고칩니다. (여러 번 setter가 나와도 microtask 한 번에 묶일 수 있음.)
             </p>
           </div>
         </header>
         <div id="container-week4-2-mount" class="sample-box week4-mount"></div>
+        <details class="week4-code-guide">
+          <summary>실제 코드 보기 · 2단계(useState)</summary>
+          <p class="panel-note week4-code-guide__note">
+            버튼 클릭 → <code>setN</code> 호출 → <code>scheduleUpdate</code>가 microtask에 <code>update()</code> 예약 →
+            <code>diffVNode</code> / <code>applyPatches</code>로 최소 변경합니다.
+          </p>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/week4-demo.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">var st = useState(0); // [값, setter]
+var n = st[0]; // 현재 상태값
+var setN = st[1]; // 상태 갱신 함수
+onClick: function () {
+  setN(function (x) { return x + 1; }); // 이전값 기반 +1
+};</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/mini-react.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">function useState(initial) {
+  var i = comp.hookIndex++; // 이번 렌더의 훅 슬롯 번호
+  if (!comp.hooks[i]) comp.hooks[i] = { type: 'state', value: initial }; // 첫 렌더 초기화
+  var hook = comp.hooks[i]; // 같은 슬롯 재사용
+  function setState(next) { hook.value = next; scheduleUpdate(comp); } // 값 갱신 + update 예약
+  return [hook.value, setState]; // [현재값, setter]
+}</pre>
+          </div>
+        </details>
       </section>
 
       <!-- 3단계: useMemo -->
@@ -78,13 +142,43 @@
         <header class="demo-phase__header demo-phase__header--accent-3">
           <span class="demo-phase__badge" aria-hidden="true">3</span>
           <div class="demo-phase__headings">
-            <h2 class="demo-phase__title" id="heading-w4-3">useMemo</h2>
+            <h2 class="demo-phase__title" id="heading-w4-3">기억해 둔 계산 — 의존할 때만 다시 계산</h2>
             <p class="demo-phase__desc">
-              <code>count</code>에만 의존하는 값과, 리렌더만 일으키는 <code>tick</code>을 분리해 캐시 동작을 눈으로 구분합니다.
+              <strong>무슨 단계인가:</strong> <code>useMemo</code>는 비싼 계산이나 파생 값을 <strong>의존 배열(deps)</strong>이 바뀔 때만 다시 실행합니다. <code>count</code>만 deps에 넣고 <code>tick</code>은 빼 두면, tick만 올려서 리렌더가 나도 캐시된 결과가 유지되는지 확인할 수 있습니다.
             </p>
           </div>
         </header>
         <div id="container-week4-3-mount" class="sample-box week4-mount"></div>
+        <details class="week4-code-guide">
+          <summary>실제 코드 보기 · 3단계(useMemo)</summary>
+          <p class="panel-note week4-code-guide__note">
+            <code>derived</code>는 <code>[count]</code>가 바뀔 때만 다시 계산합니다.
+            <code>tick</code>만 바뀌면 리렌더는 나도 memo 값은 그대로입니다.
+          </p>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/week4-demo.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">var derived = useMemo(
+  function () { return count * 10 + 1; }, // 계산식(factory)
+  [count] // count가 바뀔 때만 factory 재실행
+);</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/mini-react.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">function useMemo(factory, deps) {
+  var hook = comp.hooks[i]; // 이전 memo 슬롯
+  if (!hook || !shallowDepsEqual(hook.deps, deps)) { // 첫 렌더 또는 deps 변경
+    var computed = factory(); // 다시 계산
+    comp.hooks[i] = { type: 'memo', deps: deps, value: computed }; // 캐시 저장
+    return computed;
+  }
+  return hook.value; // deps 같으면 캐시 재사용
+}</pre>
+          </div>
+        </details>
       </section>
 
       <!-- 4단계: useEffect -->
@@ -92,14 +186,51 @@
         <header class="demo-phase__header demo-phase__header--accent-4">
           <span class="demo-phase__badge" aria-hidden="true">4</span>
           <div class="demo-phase__headings">
-            <h2 class="demo-phase__title" id="heading-w4-4">useEffect</h2>
+            <h2 class="demo-phase__title" id="heading-w4-4">그린 뒤에 할 일 — 부수 효과</h2>
             <p class="demo-phase__desc">
-              커밋 직후 microtask에서 실행됩니다. 아래 문구는 <code>theme</code> / <code>msg</code> 상태에 따라 바뀝니다.
+              <strong>무슨 단계인가:</strong> <code>useEffect</code>는 “VNode→DOM 반영”이 끝난 <strong>다음</strong>(microtask)에 돌아갑니다. 화면을 다시 그리는 게 아니라, 로그·외부 DOM·구독 같은 <strong>부수 효과</strong>를 두는 자리입니다. deps가 바뀌면 cleanup 후 다시 실행됩니다. 아래 문구는 <code>theme</code> / <code>msg</code>에 맞춰 갱신됩니다.
             </p>
           </div>
         </header>
         <div id="container-week4-4-mount" class="sample-box week4-mount"></div>
+        <p class="panel-note week4-effect-tip">
+          아래 로그는 <strong>최신 항목이 위</strong>로 쌓입니다. 버튼을 눌러보면
+          <code>render → cleanup(이전) → effect(현재)</code> 순서를 직관적으로 볼 수 있습니다.
+        </p>
         <p id="output-week4-4-effect" class="panel-note week4-effect-line" aria-live="polite"></p>
+        <p id="output-week4-4-cleanup" class="panel-note week4-effect-line" aria-live="polite"></p>
+        <ol id="output-week4-4-timeline" class="week4-effect-timeline" aria-live="polite"></ol>
+        <details class="week4-code-guide">
+          <summary>실제 코드 보기 · 4단계(useEffect)</summary>
+          <p class="panel-note week4-code-guide__note">
+            effect 본문은 렌더 함수 안에서 등록만 하고, 실제 실행은
+            <code>flushEffects()</code>의 microtask에서 처리됩니다.
+          </p>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/week4-demo.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">useEffect(function () {
+  var el = document.getElementById('output-week4-4-effect'); // 외부 DOM 참조
+  if (el) el.textContent = '[effect] theme=' + theme + ', msg=' + msg; // 부수 효과
+  return function () {}; // cleanup 자리
+}, [theme, msg]); // deps 바뀔 때만 다시 실행</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/mini-react.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">FunctionComponent.prototype.flushEffects = function () {
+  queueMicrotask(function () { // 커밋 직후 실행
+    if (hook.pendingRun) { // 이번에 돌아야 하는 effect만
+      if (hook.cleanup) hook.cleanup(); // 이전 cleanup 먼저
+      var ret = hook.fn(); // effect 본문 실행
+      if (typeof ret === 'function') hook.cleanup = ret; // 다음 cleanup 저장
+    }
+  });
+};</pre>
+          </div>
+        </details>
       </section>
 
       <!-- 5단계: 무상태 자식 + 통합 -->
@@ -107,14 +238,55 @@
         <header class="demo-phase__header demo-phase__header--accent-patch">
           <span class="demo-phase__badge" aria-hidden="true">5</span>
           <div class="demo-phase__headings">
-            <h2 class="demo-phase__title" id="heading-w4-5">Stateless 자식 + Lifting state up</h2>
+            <h2 class="demo-phase__title" id="heading-w4-5">자식은 넘겨받기만 — 상태는 위(루트)에만</h2>
             <p class="demo-phase__desc">
-              <code>h(Header, props)</code> — 자식은 훅 없이 props만 받고, 상태는 루트에만 둡니다.
+              <strong>무슨 단계인가:</strong> <code>Header</code> 같은 조각은 <code>h(Header, props)</code>로만 그립니다. 자식 함수는 <strong>props만</strong> 받아 VNode를 반환하고, <code>useState</code> 등은 이 데모의 <strong>루트</strong>에만 둡니다. 이걸 관례적으로 <em>lifting state up</em>(상태 끌어올리기)라고 부릅니다.
             </p>
           </div>
         </header>
         <div id="container-week4-5-mount" class="sample-box week4-mount"></div>
         <p id="output-week4-5-effect" class="panel-note week4-effect-line" aria-live="polite"></p>
+        <details class="week4-code-guide">
+          <summary>실제 코드 보기 · 5단계(무상태 자식 + 상태 끌어올리기)</summary>
+          <p class="panel-note week4-code-guide__note">
+            자식 함수 <code>Header</code>는 props만 받고 VNode를 반환합니다.
+            상태는 루트(<code>Week4Phase5</code>)에만 두고 자식에게 props로 내려줍니다.
+          </p>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/week4-demo.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">function Header(props) {
+  return h('header', { class: 'week4-panel__head' }, /* ... */); // props 기반 표시 전용
+}
+
+return h('div', { class: 'week4-app' }, [
+  h(Header, { title: '5단계 · Stateless Header', subtitle: 'props만 받음 · 훅 없음' }) // 자식 호출
+]);</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-wrap__bar">
+              <span class="code-wrap__label">js/mini-react.js (핵심)</span>
+            </div>
+            <pre class="code-block code-block--sm">function h(type, props) {
+  var childArgs = Array.prototype.slice.call(arguments, 2); // 3번째 인자부터 children
+  props = props == null ? {} : assignProps({}, props); // props 정규화/복사
+
+  if (typeof type === 'function') { // 함수형 자식 컴포넌트 분기
+    var prev = activeComponent; // 부모 컨텍스트 저장
+    activeComponent = null; // 자식에서 훅 사용 차단
+    try { return type(props); } // 자식 함수 실행
+    finally { activeComponent = prev; } // 부모 컨텍스트 복구
+  }
+
+  return {
+    type: type, // 일반 태그 타입
+    props: props, // 속성
+    children: normalizeChildren(childArgs), // 자식 배열 정규화
+  };
+}</pre>
+          </div>
+        </details>
       </section>
 
       <!-- 단위테스트 -->

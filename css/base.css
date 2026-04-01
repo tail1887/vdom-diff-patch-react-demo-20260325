@@ -909,6 +909,169 @@ body {
   gap: 0.65rem;
 }
 
+/* 1단계: 마운트 파이프라인 (직관용) */
+.week4-app--phase1 {
+  gap: 0.85rem;
+}
+
+.week4-phase1-lead {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--muted, #5c6570);
+}
+
+.week4-phase1-myth {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.week4-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.2rem;
+  padding: 0.75rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.week4-pipeline__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.4rem;
+  row-gap: 0.05rem;
+  align-items: center;
+  min-width: 5.5rem;
+  max-width: 11.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.week4-pipeline__step--dom {
+  border-color: rgba(34, 139, 87, 0.45);
+  background: rgba(34, 139, 87, 0.06);
+}
+
+.week4-pipeline__step-num {
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text, #1a1a1a);
+}
+
+.week4-pipeline__step--dom .week4-pipeline__step-num {
+  background: rgba(34, 139, 87, 0.25);
+}
+
+.week4-pipeline__step-title {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.week4-pipeline__step-sub {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: var(--muted, #5c6570);
+}
+
+.week4-pipeline__arrow {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--muted, #6b7280);
+  padding: 0 0.1rem;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .week4-pipeline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .week4-pipeline__arrow {
+    align-self: center;
+    transform: rotate(90deg);
+    padding: 0.15rem 0;
+  }
+
+  .week4-pipeline__step {
+    max-width: none;
+  }
+}
+
+.week4-phase1-hooks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.65rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px dashed rgba(99, 102, 241, 0.35);
+  font-size: 0.82rem;
+}
+
+.week4-phase1-hooks__label {
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.week4-phase1-hooks__value {
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 0.78rem;
+}
+
+.week4-phase1-hooks__hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted, #5c6570);
+}
+
+/* 2~5단계: 용어 설명 박스 */
+.week4-phase-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.15rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.035);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.week4-phase-meta__item {
+  margin: 0;
+}
+
+.week4-phase-meta__name {
+  font-weight: 650;
+  color: var(--text, #1a1a1a);
+}
+
 .week4-panel__head {
   margin: 0 0 0.25rem;
 }
@@ -918,9 +1081,85 @@ body {
   font-size: 1.05rem;
 }
 
+.week4-lift-map {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.week4-lift-map__box {
+  flex: 1 1 220px;
+  min-width: 180px;
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #fff;
+}
+
+.week4-lift-map__box--root {
+  border-left: 4px solid rgba(8, 145, 178, 0.7);
+}
+
+.week4-lift-map__box--child {
+  border-left: 4px solid rgba(124, 58, 237, 0.7);
+}
+
+.week4-lift-map__title {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.week4-lift-map__line {
+  margin: 0.12rem 0;
+  font-size: 0.78rem;
+}
+
+.week4-lift-map__arrow {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+  padding: 0 0.2rem;
+}
+
+.week4-child-preview {
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(124, 58, 237, 0.5);
+  background: rgba(124, 58, 237, 0.06);
+}
+
+.week4-child-preview__title {
+  margin: 0 0 0.2rem;
+  font-size: 0.79rem;
+  font-weight: 700;
+}
+
+.week4-child-preview__line {
+  margin: 0.1rem 0;
+  font-size: 0.8rem;
+}
+
+.week4-child-preview__hint {
+  margin: 0.28rem 0 0;
+  font-size: 0.74rem;
+  color: var(--muted, #5c6570);
+}
+
 .week4-line {
   margin: 0;
   font-size: 0.9rem;
+}
+
+.week4-line--em {
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .week4-toolbar {
@@ -940,6 +1179,68 @@ body {
 .week4-effect-line {
   margin-top: 0.75rem;
   min-height: 1.25rem;
+}
+
+.week4-effect-tip {
+  margin-top: 0.65rem;
+  margin-bottom: 0.2rem;
+}
+
+.week4-effect-timeline {
+  margin: 0.35rem 0 0;
+  padding: 0.5rem 0.85rem 0.5rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(15, 23, 42, 0.04);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.week4-effect-timeline li {
+  margin: 0.2rem 0;
+  color: #334155;
+}
+
+.week4-code-guide {
+  margin-top: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+}
+
+.week4-code-guide > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--bg0);
+  background: rgba(0, 0, 0, 0.035);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.week4-code-guide > summary::-webkit-details-marker {
+  display: none;
+}
+
+.week4-code-guide > summary::before {
+  content: '▸';
+  margin-right: 0.45rem;
+  color: var(--muted);
+}
+
+.week4-code-guide[open] > summary::before {
+  content: '▾';
+}
+
+.week4-code-guide .code-wrap {
+  margin: 0.55rem 0.75rem 0.75rem;
+}
+
+.week4-code-guide__note {
+  margin: 0.55rem 0.8rem 0.25rem;
+  font-size: 0.79rem;
 }
 
 .demo-phase--week4-tests {

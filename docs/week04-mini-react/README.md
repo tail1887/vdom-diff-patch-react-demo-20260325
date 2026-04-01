@@ -7,6 +7,8 @@
 | 파일 | 설명 |
 |------|------|
 | [**`study-guide.md`**](study-guide.md) | **공부용** — Week 3 한계 → Week 4 개념 → 레포 구현 연결 |
+| [`mini-react-pseudocode.md`](mini-react-pseudocode.md) | **`mini-react.js` 말로 풀기** — 의사코드 없이 서술형으로 동작 설명 |
+| [`presentation-script-beginners.md`](presentation-script-beginners.md) | **발표 대본** — 초보자 대상, `week4.html` 데모와 맞춘 장별 진행 |
 | [`requirements.md`](requirements.md) | 과제 요구사항 ↔ 레포 구현 대응표 |
 | [`implementation-phases.md`](implementation-phases.md) | 단계별 구현 페이즈 |
 

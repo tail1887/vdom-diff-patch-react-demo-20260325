@@ -4,8 +4,7 @@
  * ID 규칙은 index.html 주석과 동일:
  * - container-phase-1-sample, output-phase-1-*, container-phase-2-mount,
  *   control-phase-3-scenario, output-phase-3-vnode-old/new, output-phase-3-patches,
- *   control-phase-4-*, output-phase-4-status, output-phase-4-shadow-html, container-phase-4-mount
- */
+ *   control-phase-4-*, output-phase-4-status, output-phase-4-shadow-html, container-phase-4-moun */
 
 /** 4단계 Shadow 안에서만 쓰는 최소 스타일(외부 base.css 와 유사하게) */
 var PHASE4_SHADOW_CSS =
